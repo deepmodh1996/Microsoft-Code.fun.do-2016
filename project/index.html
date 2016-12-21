@@ -1,0 +1,221 @@
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <!--[if IE]>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <![endif]-->
+    <title>Radiance Chat Bot</title>
+    <!-- BOOTSTRAP CORE STYLE CSS -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet" />
+    <!-- FONT AWESOME  CSS -->
+    <link href="assets/css/font-awesome.css" rel="stylesheet" />
+    <!-- CUSTOM STYLE CSS -->
+    <link href="assets/css/style.css" rel="stylesheet" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src='https://code.jquery.com/jquery-1.12.4.js'></script>
+    <script src='https://code.jquery.com/ui/1.12.0/jquery-ui.js'></script>
+    <script type="text/javascript">
+        var isDateSet = false;
+        function restartFunc(){
+            var temp = '<div class="chat-box-left">Welcome to Holiday inn. How may I help you?</div><div class="chat-box-name-left"><img src="assets/img/chatBot.jpeg" alt="bootstrap Chat box user image" class="img-circle" />-  Hotel Manager</div><hr class="hr-clas" />';
+            $('#chatScreen').html(temp);
+        };
+
+        function myFunc(){
+            var reply = '';
+            var temp1 = '<div class="chat-box-right">'+
+                           $('#enterText').val()+
+                        '</div><div class="chat-box-name-right"><img src="assets/img/user.png" alt="bootstrap Chat box user image" class="img-circle" />  &nbsp;-  Aryan </div><hr class="hr-clas" /><div class="chat-box-left">';
+            var temp2 = '</div><div class="chat-box-name-left"><img src="assets/img/chatBot.jpeg" alt="bootstrap Chat box user image" class="img-circle" />- Hotel Manager</div><hr class="hr-clas" />';
+            if(isDateSet==true){
+                var checkInDate = $(".checkInDate:last").val();
+                var checkOutDate = $(".checkOutDate:last").val();
+                reply = "Wait a second, let me check ...... <br>"
+                if(Math.random()<0.2){
+                    reply += "We are sorry but we are totally booked from " + checkInDate + " to " + checkOutDate;
+                    reply += "<br>Is there any thing else I can help you with?";
+                }
+                else{
+                    reply += "We have rooms available from " + checkInDate + " to " + checkOutDate;
+                }
+                $('#chatScreen').append('<div class="chat-box-left">'+reply+temp2);
+                isDateSet = false;
+
+            }else{
+                            var userInput = $('#enterText').val();
+                            if(userInput.length == 0){return;}
+
+                            var temp1Array = userInput.toLowerCase().split(" ");
+                             var params = {
+                                    // Request parameters
+                            };
+                            $.ajax({
+                                url: "https://westus.api.cognitive.microsoft.com/text/analytics/v2.0/keyPhrases?" + $.param(params),
+                                beforeSend: function(xhrObj){
+                                    // Request headers
+                                    xhrObj.setRequestHeader("Content-Type","application/json");
+                                    xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key","7b4df6f7b4234632923822d04105627a");
+                                },
+                                type: "POST",
+                                // Request body
+                                data: "{'documents': [{'language': 'en','id': 'string','text': '"+userInput+"'}]}",
+                            })
+                            .done(function(data) {
+                                    
+                                    if(data.documents[0].keyPhrases.length==0){
+                                        reply = "Please explain in detail.";
+                                    }
+                                    else{
+                                        var temp = data.documents[0].keyPhrases[0].toLowerCase();
+                                        var tempArray = temp.split(" ");
+                                        if(tempArray.includes('price')){temp = 'price';}
+                                        if(tempArray.includes('sight')){temp = 'sight';}
+                                        if(tempArray.includes('internet') || (tempArray.includes('wifi')) ){temp = 'internet';}
+                                        if(temp1Array.includes('online')){temp = 'online';}
+                                        if(temp1Array.includes('advance')){temp = 'advance';}
+                                        if(tempArray.includes('offer') || (tempArray.includes('offers')) ){temp = 'offer';}
+                                      
+
+
+
+                                         switch(temp) {
+                                            case "banana":
+                                                reply = "Banana is good!";
+                                            break;
+                                            
+                                            case "orange":
+                                                reply = "I am not a fan of orange.";
+                                            break;
+                                           
+                                            case "room":
+                                            case "single room":
+                                            case "double room":
+                                            case "twin room":
+                                                reply = "We have single room, double room, twin room and suite. When do you want to stay?<br><br>";
+                                                reply += "<form class='form-horizontal'> <div class='form-group'><label for='checkInDate' class='col-sm-3 col-sm-offset-1 control-label'>Check In : </label><div class='col-sm-6'><input type='date' class='form-control checkInDate' value='2016-11-26'></div></div><div class='form-group'><label for='checkOutDate' class='col-sm-3  col-sm-offset-1 control-label'>Check Out : </label><div class='col-sm-6'><input type='date' class='form-control checkOutDate' value='2016-11-28'></div></div></form>";
+                                                isDateSet = true;
+                                            break;
+                                            
+                                            case "price":
+                                                reply = "Price of single room is 1400 Rs, double room is 2000 Rs, twin room is 3000 Rs and suite is 5000 Rs. You don't need to pay advance.";
+                                            break;
+
+                                            case "meal":
+                                            case "lunch":
+                                            case "dinner":
+                                            case "breakfast":
+                                            case "food":
+                                                reply = "Price includes break fast and dinner, but not the lunch. ";
+                                            break;
+
+                                            case "sight":
+                                            case "place":
+                                            case "places":
+                                                reply = "We have beautiful Powai Lake 10 min walking distance away. However we don't provide any special arrangements for that.";
+                                            break;
+
+                                            case "internet":
+                                                reply = "Yes, we have 10 Mbps internet access everywhere inside our hotel.";
+                                            break;
+
+                                            case "online":
+                                                reply = "Yes, you can easily book online on our website : www.HolidayInn.com/booking ";
+                                            break;
+
+                                            case "advance":
+                                            case "reservation":
+                                            case "reserve":
+                                                reply = "You can do advance booking only through our website : www.HolidayInn.com/booking ";
+                                            break;
+
+                                            case "offer":
+                                            case "discount":
+                                                reply = "I am afraid, we do not have any special offers."
+                                            break;
+
+                                            case "bye":
+                                                reply = "Thank you for visiting Holiday Inn. Bye ! Have a nice day !!!"
+                                            break;
+
+                                            default:
+                                             reply = "Please explain in detail.";
+                                        }
+                                }
+                    
+
+                                    $('#chatScreen').append(temp1+reply+temp2);
+                                    $('#enterText').val('');
+                                
+                            })
+                            .fail(function() {
+                                alert("Error");
+                            });
+                    }
+
+           
+        };
+    </script>
+</head>
+<body background='assets/img/background1.jpg'>
+
+
+    <div class="container">
+        <div class="row pad-top pad-bottom">
+            <div class=" col-lg-3 col-md-3 col-sm-3">
+            </div>
+
+            <div class=" col-lg-6 col-md-6 col-sm-6">
+                <div class="chat-box-div">
+                    <div class="chat-box-head">
+                        Radiance Chat Bot
+                            <div class="btn-group pull-right" style="padding-top:9px;">
+                                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <span class="fa fa-cogs"></span>
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="#" onclick="restartFunc()"><span class="fa fa-repeat"></span>&nbsp;Restart Chat</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="#" onclick="restartFunc()"><span class="fa fa-power-off"></span>&nbsp;Logout</a></li>
+                                </ul>
+                            </div>
+                    </div>
+                    <div class="panel-body chat-box-main" id="chatScreen">
+                        <div class="chat-box-left">
+                            Welcome to Holiday inn. How may I help you?
+                        </div>
+                        <div class="chat-box-name-left">
+                            <img src="assets/img/chatBot.jpeg" alt="bootstrap Chat box user image" class="img-circle" />
+                            -  Hotel Manager
+                        </div>
+                        <hr class="hr-clas" />
+                       
+                    </div>
+                    <div class="chat-box-footer">
+                        <div class="input-group" style="font-size:17px">
+                            <input type="text" class="form-control" placeholder="Enter Text Here..." id="enterText">
+                            <span class="input-group-btn">
+                                <button class="btn btn-info" type="button" id="sendButton" onclick="myFunc()" ontap="myFunc()">SEND</button>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+           
+           
+        </div>
+    </div>
+
+    <!-- USING SCRIPTS BELOW TO REDUCE THE LOAD TIME -->
+    <!-- CORE JQUERY SCRIPTS FILE -->
+    <script src="assets/js/jquery-1.11.1.js"></script>
+    <!-- CORE BOOTSTRAP SCRIPTS  FILE -->
+    <script src="assets/js/bootstrap.js"></script>
+</body>
+
+</html>
