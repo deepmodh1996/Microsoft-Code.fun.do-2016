@@ -10,6 +10,6 @@ We all know that Coustomer Care is not at all user friendly. No one wants to pre
 ### How to run :
 
 1. Download project folder.
-2. On line 60 enter your Ocp-Apim key. That's it !!!
+2. On line 60 of [index.html](./project/index.html) enter your Ocp-Apim key. That's it !!!
 
 Open index.html to start using bot.
